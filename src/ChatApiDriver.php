@@ -102,8 +102,9 @@ class ChatApiDriver extends HttpDriver
                 $payload['filename'] = $this->getAttachmentFileName($attachment);
             }
         }
-
-        $this->config = Collection::make($this->getConfiguration($additionalParameters['instance']));
+        if ($additionalParameters['instance']) {
+            $this->config = Collection::make($this->getConfiguration($additionalParameters['instance']));
+        }
 
         return $payload;
     }
