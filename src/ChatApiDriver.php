@@ -8,7 +8,6 @@
 
 namespace ChatApiDriver;
 
-
 use BotMan\BotMan\Drivers\HttpDriver;
 use BotMan\BotMan\Interfaces\UserInterface;
 use BotMan\BotMan\Messages\Attachments\Attachment;
@@ -22,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChatApiDriver extends HttpDriver
 {
-
     const DRIVER_NAME = 'ChatApi';
 
     /**
@@ -51,7 +49,8 @@ class ChatApiDriver extends HttpDriver
         if (empty($this->messages)) {
             $message = $this->event->get('body');
             $userId = $this->event->get('chatId');
-            $this->messages = [new IncomingMessage($message, $userId, $userId, $this->payload)];
+            $receipt = $this->payload['instanceId'];
+            $this->messages = [new IncomingMessage($message, $userId, $receipt, $this->payload)];
         }
         return $this->messages;
     }
@@ -95,14 +94,16 @@ class ChatApiDriver extends HttpDriver
         $payload['chatId'] = $matchingMessage->getSender();
         $payload['body'] = $message->getText();
 
-        if($message instanceof OutgoingMessage) {
-            if(!is_null($message->getAttachment())) {
+        if ($message instanceof OutgoingMessage) {
+            if (!is_null($message->getAttachment())) {
                 $attachment = $message->getAttachment();
                 $payload['chatId'] = $matchingMessage->getSender();
                 $payload['body'] = $this->getSecureAttachmentUrl($attachment);
                 $payload['filename'] = $this->getAttachmentFileName($attachment);
             }
         }
+
+        $this->config = Collection::make($this->getConfiguration($additionalParameters['instance']));
 
         return $payload;
     }
@@ -114,7 +115,7 @@ class ChatApiDriver extends HttpDriver
     public function sendPayload($payload)
     {
         $action = 'message';
-        if(isset($payload['filename'])) {
+        if (isset($payload['filename'])) {
             $action = 'sendFile';
         }
 
@@ -136,9 +137,28 @@ class ChatApiDriver extends HttpDriver
                 'body' => null,
                 'chatId' => null
             ]);
-        $this->config = Collection::make($this->config->get('chatapi', []));
+
+        $instanceId = isset($this->payload['instanceId']) ? $this->payload['instanceId'] : false;
+        $this->config = Collection::make($this->getConfiguration($instanceId));
     }
-    // Test
+
+    /**
+     * get InstanceId Token
+     * @param  [type] $instanceId [description]
+     * @return array
+     */
+    public function getConfiguration($instanceId) : array
+    {
+        $device = \App\Device::where('uid', $instanceId)->pluck('token')->first();
+        return [
+                    'instance_url' => "https://api.chat-api.com/instance{$instanceId}/",
+                     'token' => $device
+            ];
+    }
+
+
+
+
     /**
      * Low-level method to perform driver specific API requests.
      *
@@ -158,7 +178,8 @@ class ChatApiDriver extends HttpDriver
         return collect(explode('/', $attachment->getUrl()))->last();
     }
 
-    protected function getSecureAttachmentUrl(Attachment $attachment) {
+    protected function getSecureAttachmentUrl(Attachment $attachment)
+    {
         return str_replace('http', 'https', $attachment->getUrl());
     }
 }
