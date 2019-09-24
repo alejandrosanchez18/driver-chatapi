@@ -181,6 +181,6 @@ class ChatApiDriver extends HttpDriver
 
     protected function getSecureAttachmentUrl(Attachment $attachment)
     {
-        return str_replace('http', 'https', $attachment->getUrl());
+        return $attachment->getUrl();
     }
 }
