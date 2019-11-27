@@ -16,6 +16,7 @@ use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
 use BotMan\BotMan\Users\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -98,8 +99,13 @@ class ChatApiDriver extends HttpDriver
             if (!is_null($message->getAttachment())) {
                 $attachment = $message->getAttachment();
                 $payload['chatId'] = $matchingMessage->getSender();
-                $payload['body'] = $this->getSecureAttachmentUrl($attachment);
-                $payload['filename'] = $this->getAttachmentFileName($attachment);
+
+                   if(Str::contains($attachment->getUrl(), '.ogg')){
+                        $payload['audio'] = $attachment->getUrl();
+                    }else {
+                    $payload['body'] = $attachment->getUrl();
+                    $payload['filename'] = $this->getAttachmentFileName($attachment);
+                    }
             }
         }
         if (isset($additionalParameters['instance'])) {
@@ -118,6 +124,9 @@ class ChatApiDriver extends HttpDriver
         $action = 'message';
         if (isset($payload['filename'])) {
             $action = 'sendFile';
+        }
+        if (isset($payload['audio'])) {
+            $action = 'sendPTT';
         }
 
         $url = $this->config->get('instance_url') . "/{$action}?token={$this->config->get('token')}";
