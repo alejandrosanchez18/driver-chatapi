@@ -170,7 +170,6 @@ class ChatApiDriver extends HttpDriver
      */
     public function sendRequest($endpoint, array $parameters, IncomingMessage $matchingMessage)
     {
-        $this->config = Collection::make($this->getConfiguration($parameters['instance']));
         $url = $this->config->get('instance_url') . "/{$endpoint}?token={$this->config->get('token')}";
         $this->http->post($url, [], $parameters);
     }
