@@ -162,7 +162,7 @@ class ChatApiDriver extends HttpDriver
         $instance = \App\Instance::where('uid', $instanceId)->pluck('token')->first();
         return [
                     'instance_url' => "https://api.chat-api.com/instance{$instanceId}/",
-                     'token' => $device
+                     'token' => $instance
             ];
     }
 
