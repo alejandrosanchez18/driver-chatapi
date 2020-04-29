@@ -100,12 +100,13 @@ class ChatApiDriver extends HttpDriver
                 $attachment = $message->getAttachment();
                 $payload['chatId'] = $matchingMessage->getSender();
 
-                   if(Str::contains($attachment->getUrl(), '.ogg')){
-                        $payload['audio'] = $attachment->getUrl();
-                    }else {
+                if (Str::contains($attachment->getUrl(), '.ogg')) {
+                    $payload['audio'] = $attachment->getUrl();
+                } else {
                     $payload['body'] = $attachment->getUrl();
                     $payload['filename'] = $this->getAttachmentFileName($attachment);
-                    }
+                    $payload['caption'] = $message->getText();
+                }
             }
         }
         if (isset($additionalParameters['instance'])) {
@@ -127,6 +128,9 @@ class ChatApiDriver extends HttpDriver
         }
         if (isset($payload['audio'])) {
             $action = 'sendPTT';
+        }
+        if (isset($payload['messageId'])) {
+            $action = 'forwardMessage';
         }
 
         $url = $this->config->get('instance_url') . "/{$action}?token={$this->config->get('token')}";
