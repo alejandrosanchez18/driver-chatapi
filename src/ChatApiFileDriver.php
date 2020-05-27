@@ -28,7 +28,7 @@ class ChatApiFileDriver extends ChatApiDriver
             ! is_null($this->event->get('chatId')) &&
             ! $this->event->get('fromMe') &&
             ! is_null($this->event->get('type')) &&
-            ($this->event->get('type') == 'image' || $this->event->get('type') == 'file');
+            ($this->event->get('type') == 'image' || $this->event->get('type') == 'file' || $this->event->get('type') == 'document' || $this->event->get('type') == 'ptt' || $this->event->get('type') == 'video' || $this->event->get('type') == 'audio');
 
         return $matches;
     }
@@ -46,7 +46,7 @@ class ChatApiFileDriver extends ChatApiDriver
             case 'image':
                 $pattern = Image::PATTERN;
                 break;
-            case 'file':
+            case 'file || document || ptt || video || audio':
                 $pattern = File::PATTERN;
                 break;
         }
