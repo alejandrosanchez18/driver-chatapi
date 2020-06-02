@@ -163,11 +163,11 @@ class ChatApiDriver extends HttpDriver
      */
     public function getConfiguration($instanceId) : array
     {
-        if($instanceId){
-            $instance = \App\ChatapiInstance::where('uid', $instanceId)->pluck('token')->first();
+        if ($instanceId) {
+            $token = \App\ChatapiInstance::where('uid', $instanceId)->pluck('token')->first();
             return [
                         'instance_url' => "https://api.chat-api.com/instance{$instanceId}/",
-                         'token' => $instance
+                         'token' => $token
                 ];
         } else {
             return [];
