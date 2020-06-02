@@ -170,7 +170,7 @@ class ChatApiDriver extends HttpDriver
                          'token' => $instance
                 ];
         } else {
-            return '';
+            return [];
         }
     }
 
