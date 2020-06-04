@@ -92,14 +92,16 @@ class ChatApiDriver extends HttpDriver
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
         $payload = [];
-        $payload['chatId'] = $matchingMessage->getSender();
+        if (Str::contains($matchingMessage->getSender(), ['@c.us', '@g.us'])) {
+            $payload['chatId'] = $matchingMessage->getSender();
+        } else {
+            $payload['phone'] = $matchingMessage->getSender();
+        }
         $payload['body'] = $message->getText();
 
         if ($message instanceof OutgoingMessage) {
             if (!is_null($message->getAttachment())) {
                 $attachment = $message->getAttachment();
-                $payload['chatId'] = $matchingMessage->getSender();
-
                 if (Str::contains($attachment->getUrl(), '.ogg')) {
                     $payload['audio'] = $attachment->getUrl();
                 } else {
