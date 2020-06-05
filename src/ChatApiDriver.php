@@ -147,11 +147,13 @@ class ChatApiDriver extends HttpDriver
         $result = json_decode($response->getContent(), true);
         if (isset($result['sent']) && $result['sent'] = 'true') {
             $status = 'sent';
+            $id = $result['id'];
         } else {
             $status = 'error';
         }
 
-        $this->saveMessage($response, $status);
+
+        $this->saveMessage($response, $status, $id);
 
 
         return $response;
