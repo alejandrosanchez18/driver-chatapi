@@ -9,6 +9,7 @@
 namespace ChatApiDriver;
 
 use BotMan\BotMan\Drivers\HttpDriver;
+use App\Extensions\GeneralDriver;
 use BotMan\BotMan\Interfaces\UserInterface;
 use BotMan\BotMan\Messages\Attachments\Attachment;
 use BotMan\BotMan\Messages\Incoming\Answer;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChatApiDriver extends HttpDriver
 {
+    use GeneralDriver;
     const DRIVER_NAME = 'ChatApi';
 
     /**
@@ -109,11 +111,15 @@ class ChatApiDriver extends HttpDriver
                     $payload['filename'] = $this->getAttachmentFileName($attachment);
                     $payload['caption'] = $message->getText();
                 }
+                $additionalParameters['file'] = $this->getAttachmentFileName($attachment);
             }
         }
         if (isset($additionalParameters['instance'])) {
             $this->config = Collection::make($this->getConfiguration($additionalParameters['instance']));
         }
+
+        $additionalParameters['message'] = $message->getText();
+        $this->params = $additionalParameters;
 
         return $payload;
     }
@@ -137,6 +143,17 @@ class ChatApiDriver extends HttpDriver
 
         $url = $this->config->get('instance_url') . "/{$action}?token={$this->config->get('token')}";
         $response = $this->http->post($url, [], $payload);
+
+        $result = json_decode($response->getContent(), true);
+        if (isset($result['sent']) && $result['sent'] = 'true') {
+            $status = 'sent';
+        } else {
+            $status = 'error';
+        }
+
+        $this->saveMessage($response, $status);
+
+
         return $response;
     }
 
