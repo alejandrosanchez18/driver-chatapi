@@ -117,7 +117,7 @@ class ChatApiDriver extends HttpDriver
         if (isset($additionalParameters['instance'])) {
             $this->config = Collection::make($this->getConfiguration($additionalParameters['instance']));
         }
-
+        $additionalParameters['chat_id'] = $matchingMessage->getSender();
         $additionalParameters['message'] = $message->getText();
         $this->params = $additionalParameters;
 
