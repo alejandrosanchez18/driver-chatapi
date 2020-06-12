@@ -51,7 +51,11 @@ class ChatApiDriver extends HttpDriver
     {
         if (empty($this->messages)) {
             $message = $this->event->get('body');
-            $userId = Str::before($this->event->get('chatId'), '@');
+            if (Str::contains($matchingMessage->getSender(), ['@g.us'])) {
+                $userId = $matchingMessage->getSender();
+            } else {
+                $userId = Str::before($this->event->get('chatId'), '@');
+            }
             $receipt = $this->payload['instanceId'];
             $this->messages = [new IncomingMessage($message, $userId, $receipt, $this->payload)];
         }
@@ -94,7 +98,7 @@ class ChatApiDriver extends HttpDriver
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
         $payload = [];
-        if (Str::contains($matchingMessage->getSender(), ['@c.us', '@g.us'])) {
+        if (Str::contains($matchingMessage->getSender(), ['@c.us'])) {
             $payload['chatId'] = $matchingMessage->getSender();
         } else {
             $payload['phone'] = $matchingMessage->getSender();
