@@ -51,7 +51,7 @@ class ChatApiDriver extends HttpDriver
     {
         if (empty($this->messages)) {
             $message = $this->event->get('body');
-            $userId = $this->event->get('chatId');
+            $userId = Str::before($this->event->get('chatId'), '@');
             $receipt = $this->payload['instanceId'];
             $this->messages = [new IncomingMessage($message, $userId, $receipt, $this->payload)];
         }
@@ -150,6 +150,7 @@ class ChatApiDriver extends HttpDriver
             $id = $result['id'];
         } else {
             $status = 'error';
+            $id = null;
         }
 
 
