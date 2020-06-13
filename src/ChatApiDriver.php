@@ -98,7 +98,7 @@ class ChatApiDriver extends HttpDriver
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
         $payload = [];
-        if (Str::contains($matchingMessage->getSender(), ['@c.us'])) {
+        if (Str::contains($matchingMessage->getSender(), ['@g.us'])) {
             $payload['chatId'] = $matchingMessage->getSender();
         } else {
             $payload['phone'] = $matchingMessage->getSender();
