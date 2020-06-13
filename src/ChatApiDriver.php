@@ -51,8 +51,8 @@ class ChatApiDriver extends HttpDriver
     {
         if (empty($this->messages)) {
             $message = $this->event->get('body');
-            if (Str::contains($matchingMessage->getSender(), ['@g.us'])) {
-                $userId = $matchingMessage->getSender();
+            if (Str::contains($this->event->get('chatId'), ['@g.us'])) {
+                $userId = $this->event->get('chatId');
             } else {
                 $userId = Str::before($this->event->get('chatId'), '@');
             }
