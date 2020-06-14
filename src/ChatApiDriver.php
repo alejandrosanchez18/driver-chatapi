@@ -38,7 +38,7 @@ class ChatApiDriver extends HttpDriver
             ! $this->event->get('fromMe') &&
             ! is_null($this->event->get('type')) &&
             $this->event->get('type') == 'chat' &&
-            !(Str::contains($request['chatId'], ['@g.us']));
+            !(Str::contains($this->event->get('chatId'), ['@g.us']));
 
         return $matches;
     }
