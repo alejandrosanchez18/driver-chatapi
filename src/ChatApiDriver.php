@@ -109,7 +109,7 @@ class ChatApiDriver extends HttpDriver
         if ($message instanceof OutgoingMessage) {
             if (!is_null($message->getAttachment())) {
                 $attachment = $message->getAttachment();
-                if (Str::contains($attachment->getUrl(), '.ogg')) {
+                if (Str::contains($attachment->getUrl(), ['.ogg', '.oga'])) {
                     $payload['audio'] = $attachment->getUrl();
                 } else {
                     $payload['body'] = $attachment->getUrl();
